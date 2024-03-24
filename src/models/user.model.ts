@@ -7,18 +7,21 @@ import * as jwt from "jsonwebtoken";
 export class User {
   email: string;
   password: string;
-  name: string;
+  fname: string;
+  lname: string;
   id: string;
   lisence_id?: string;
   constructor(
     _email: string,
     _password: string,
-    _name: string = "",
+    _fname: string = "",
+    _lname: string = "",
     _id: string = ""
   ) {
     this.email = _email;
     this.password = _password;
-    this.name = _name;
+    this.fname = _fname;
+    this.lname = _lname;
     this.id = _id;
   }
 
@@ -37,7 +40,7 @@ export class User {
           return {
             accesstoken,
             refreshToken,
-            ...user,
+            user,
           };
         }
       }
@@ -51,14 +54,16 @@ export class User {
   async signup() {
     const hashedPassword = await bcrypt.hash(this.password, 10);
     try {
-      const result = await pool.query("SELECT * FROM signup($1, $2, $3)", [
+      const result = await pool.query("SELECT * FROM signup($1, $2, $3,$4)", [
         this.email,
         hashedPassword,
-        this.name,
+        this.fname,
+        this.lname,
       ]);
       let user: User = result.rows[0];
       return user;
     } catch (error) {
+      console.log(error);
       return null;
     }
   }

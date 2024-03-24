@@ -26,7 +26,7 @@ route.post("/token", (request: Request, response: Response) => {
   });
 });
 
-route.delete("/logout", authController.logoutController);
+route.delete("/logout/:token", authController.logoutController);
 
 route.post("/signup", authController.signupController);
 

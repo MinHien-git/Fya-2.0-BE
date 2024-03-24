@@ -20,16 +20,18 @@ async function signinController(request: Request, response: Response) {
 }
 
 async function signupController(request: Request, response: Response) {
-  const { name, email, password } = request.body;
-  let user = new User(email, password, name);
+  const { lname, fname, email, password } = request.body;
+  let user = new User(email, password, fname, lname);
   let result = await user.signup();
   if (result?.email != null) {
     return response.json({
       data: { ...result },
       message: "Sign up successfully",
+      status: 200,
     });
   } else {
     return response.json({
+      status: 400,
       message: "Sign up failed",
       data: null,
     });
@@ -37,7 +39,8 @@ async function signupController(request: Request, response: Response) {
 }
 
 async function logoutController(request: Request, response: Response) {
-  await pool.query("Select * FROM remove_token($1)", [request.body.token]);
+  let { token } = request.params;
+  await pool.query("Select * FROM remove_token($1)", [token]);
   response.sendStatus(204);
 }
 
