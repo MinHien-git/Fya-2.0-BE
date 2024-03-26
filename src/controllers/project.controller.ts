@@ -34,9 +34,41 @@ async function getProjectDetail(request: Request, response: Response) {
 }
 
 async function postProject(request: Request, response: Response) {
-  let { title, description } = request.body;
+  let {
+    bugetRange,
+    companyName,
+    companySize,
+    companylocation,
+    industry,
+    languages,
+    localization,
+    location,
+    position,
+    projectDescription,
+    projectDuration,
+    projectTitle,
+    services,
+    skills,
+  } = request.body;
+
   if (request.user) {
-    let project = new Project(title, description, request.user.id);
+    let project = new Project(
+      bugetRange,
+      companyName,
+      companySize,
+      companylocation,
+      industry,
+      languages,
+      localization,
+      location,
+      position,
+      projectDescription,
+      projectDuration,
+      projectTitle,
+      services,
+      skills,
+      request.user.id
+    );
 
     let data = await project.postProject();
 
