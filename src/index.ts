@@ -10,6 +10,8 @@ const port = process.env.PORT;
 const authenticationRoute = require("./routes/authentication.routes");
 const projectRoute = require("./routes/project.routes");
 const adminRoute = require("./routes/admin.routes");
+const pageRoute = require("./routes/page.routes");
+
 const corsConfig = {
   origin: true,
   credentials: true,
@@ -22,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(authenticationRoute);
 app.use(projectRoute);
+app.use(pageRoute);
 
 //Admin route
 app.use(adminRoute);
