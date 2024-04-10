@@ -38,6 +38,22 @@ async function signupController(request: Request, response: Response) {
   }
 }
 
+async function getUserInformation(request: Request, response: Response) {
+  if (request.user) {
+    return response.json({
+      data: request.user,
+      message: "Get user successfully",
+      status: 200,
+    });
+  } else {
+    return response.status(400).json({
+      data: null,
+      message: "Failed to get user",
+      status: 400,
+    });
+  }
+}
+
 async function logoutController(request: Request, response: Response) {
   let { token } = request.params;
   await pool.query("Select * FROM remove_token($1)", [token]);
@@ -48,4 +64,5 @@ module.exports = {
   signinController: signinController,
   signupController: signupController,
   logoutController: logoutController,
+  getUserInformation: getUserInformation,
 };

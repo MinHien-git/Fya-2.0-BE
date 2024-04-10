@@ -63,4 +63,5 @@ route.delete("/logout/:token", authController.logoutController);
 route.post("/signup", authController.signupController);
 
 route.post("/signin", authController.signinController);
+route.get("/getUserInformation", authController.getUserInformation);
 module.exports = route;
