@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Page from "../models/page.models";
+import pool from "../database";
 
 async function postPage(request: Request, response: Response) {
   let {
@@ -57,8 +58,27 @@ async function getPageDetail(request: Request, response: Response) {
   });
 }
 
+async function getManageDetail(request: Request, response: Response) {
+  let { userId } = request.params;
+  console.log(userId);
+  let result = await Page.getPage(userId);
+
+  if (result) {
+    return response.json({
+      message: "get page sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "get page failed",
+      data: null,
+    });
+  }
+}
+
 module.exports = {
   postPage,
   getPages,
   getPageDetail,
+  getManageDetail,
 };

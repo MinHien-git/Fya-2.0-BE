@@ -69,4 +69,15 @@ export default class Page {
       return null;
     }
   }
+
+  static async getPage(_id: string) {
+    try {
+      let result = await pool.query("Select * from get_page($1)", [_id]);
+      console.log(result);
+      return result.rows[0];
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
 }

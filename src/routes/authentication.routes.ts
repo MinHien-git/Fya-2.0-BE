@@ -12,18 +12,50 @@ let authController = require("../controllers/authentication.controller");
 const route = express.Router();
 
 route.post("/token", (request: Request, response: Response) => {
-  const refreshToken = request.body.token;
-  if (refreshToken == null) return response.sendStatus(401);
-  if (!refreshToken.includes(refreshToken)) {
-    return response.sendStatus(403);
+  try {
+    const refreshToken = request.body.token;
+    if (refreshToken == null) return response.sendStatus(401);
+    if (!refreshToken.includes(refreshToken)) {
+      return response.sendStatus(403);
+    }
+    jwt.verify(refreshToken, REFRESH_TOKEN, async (error: any, user: any) => {
+      if (error) return response.sendStatus(403);
+
+      await pool.query("Select * FROM remove_token($1)", [refreshToken]);
+
+      const newRfToken = jwt.sign(user, REFRESH_TOKEN);
+      const accesstoken = authUtils.generateAccessToken({ email: user.email });
+
+      await pool.query("Select * FROM add_token($1)", [newRfToken]);
+
+      response.json({
+        accesstoken: accesstoken,
+        refreshToken: newRfToken,
+        user: user,
+      });
+    });
+  } catch (error) {
+    console.log(error);
   }
-  jwt.verify(refreshToken, REFRESH_TOKEN, (error: any, user: any) => {
-    if (error) return response.sendStatus(403);
+});
 
-    const accesstoken = authUtils.generateAccessToken({ email: user.email });
+route.post("/refreshtoken", (request: Request, response: Response) => {
+  try {
+    const refreshToken = request.body.token;
+    if (refreshToken == null) return response.sendStatus(401);
+    if (!refreshToken.includes(refreshToken)) {
+      return response.sendStatus(403);
+    }
+    jwt.verify(refreshToken, REFRESH_TOKEN, async (error: any, user: any) => {
+      if (error) return response.sendStatus(403);
 
-    response.json({ accesstoken: accesstoken });
-  });
+      response.json({
+        user: user,
+      });
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 route.delete("/logout/:token", authController.logoutController);
