@@ -4,13 +4,14 @@ import authenticationMiddleware from "../middlewares/authentication.middleware";
 const router = express.Router();
 const pageController = require("../controllers/page.controller");
 
-router.use(authenticationMiddleware);
 router.get("/page", pageController.getPages);
+router.get("/page/:id", pageController.getPageDetail);
 
-router.get("/page/:userId", pageController.getManageDetail);
+router.use(authenticationMiddleware);
+
+router.get("/management/page/:userId", pageController.getManageDetail);
+router.put("/page/about/update/:pageId", pageController.putAboutPaage);
 
 router.post("/page", pageController.postPage);
-
-router.get("/project/:id", pageController.getPageDetail);
 
 module.exports = router;

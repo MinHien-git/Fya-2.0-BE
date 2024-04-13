@@ -11,6 +11,8 @@ export default class Page {
   team_members: string = "";
   website: string = "";
   createdBy: string = "";
+  turnover: string = "USD";
+  tagline: string = "";
   constructor(
     address: string = "",
     company_name: string = "",
@@ -21,7 +23,9 @@ export default class Page {
     phone_number: string = "",
     team_members: string = "",
     website: string = "",
-    createdBy: string = ""
+    createdBy: string = "",
+    tagLine = "",
+    turnover = "USD"
   ) {
     this.address = address;
     this.company_name = company_name;
@@ -33,6 +37,8 @@ export default class Page {
     this.team_members = team_members;
     this.website = website;
     this.createdBy = createdBy;
+    this.tagline = tagLine;
+    this.turnover = turnover;
   }
   static async getPages() {
     try {
@@ -72,8 +78,41 @@ export default class Page {
 
   static async getPage(_id: string) {
     try {
+      let result = await pool.query("Select * from get_brand_page($1)", [_id]);
+      console.log(result);
+      return result.rows[0];
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
+  static async getManageDetail(_id: string) {
+    try {
       let result = await pool.query("Select * from get_page($1)", [_id]);
       console.log(result);
+      return result.rows[0];
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+
+  async UpdatePageAbout(_id: string) {
+    try {
+      let result = await pool.query(
+        "Select * from update_agency_about($1,$2,$3,$4,$5,$6,$7,$8)",
+        [
+          this.company_name,
+          this.turnover,
+          this.languages,
+          this.founded_date,
+          _id,
+          this.tagline,
+          this.description,
+          this.team_members,
+        ]
+      );
       return result.rows[0];
     } catch (e) {
       console.log(e);

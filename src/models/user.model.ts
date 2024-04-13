@@ -33,7 +33,9 @@ export class User {
       if (user.email != null) {
         if (bcrypt.compareSync(this.password, user.password)) {
           const accesstoken = authUtils.generateAccessToken(user);
-          const refreshToken = jwt.sign(user, REFRESH_TOKEN);
+          const refreshToken = jwt.sign({ ...user }, REFRESH_TOKEN, {
+            expiresIn: "31d",
+          });
 
           await pool.query("Select * FROM add_token($1)", [refreshToken]);
 

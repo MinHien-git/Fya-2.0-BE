@@ -52,16 +52,17 @@ async function getPages(request: Request, response: Response) {
 
 async function getPageDetail(request: Request, response: Response) {
   let { id } = request.params;
+  let result = await Page.getPage(id);
   return response.json({
-    message: "post create page sucessfully",
-    data: request.body,
+    message: "get page sucessfully",
+    data: result,
   });
 }
 
 async function getManageDetail(request: Request, response: Response) {
   let { userId } = request.params;
   console.log(userId);
-  let result = await Page.getPage(userId);
+  let result = await Page.getManageDetail(userId);
 
   if (result) {
     return response.json({
@@ -76,9 +77,51 @@ async function getManageDetail(request: Request, response: Response) {
   }
 }
 
+async function putAboutPaage(request: Request, response: Response) {
+  let { pageId } = request.params;
+  let {
+    address,
+    company_name,
+    description,
+    founded_date,
+    languages,
+    team_members,
+    tagline,
+    turnover,
+  } = request.body;
+  let page = new Page(
+    address,
+    company_name,
+    description,
+    "",
+    founded_date,
+    languages,
+    "",
+    team_members,
+    "",
+    "",
+    tagline,
+    turnover
+  );
+  let result = await page.UpdatePageAbout(pageId);
+
+  if (result) {
+    return response.json({
+      message: "update about page sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "update about page failed",
+      data: null,
+    });
+  }
+}
+
 module.exports = {
   postPage,
   getPages,
   getPageDetail,
   getManageDetail,
+  putAboutPaage,
 };

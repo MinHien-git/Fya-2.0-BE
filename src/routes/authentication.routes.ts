@@ -23,7 +23,7 @@ route.post("/token", (request: Request, response: Response) => {
 
       await pool.query("Select * FROM remove_token($1)", [refreshToken]);
 
-      const newRfToken = jwt.sign(user, REFRESH_TOKEN);
+      const newRfToken = jwt.sign(user, REFRESH_TOKEN, { expiresIn: "31d" });
       const accesstoken = authUtils.generateAccessToken({ email: user.email });
 
       await pool.query("Select * FROM add_token($1)", [newRfToken]);
