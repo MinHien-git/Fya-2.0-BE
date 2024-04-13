@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Page from "../models/page.models";
 import pool from "../database";
+import { Award } from "../models/award.models";
 
 async function postPage(request: Request, response: Response) {
   let {
@@ -118,10 +119,70 @@ async function putAboutPaage(request: Request, response: Response) {
   }
 }
 
+async function postPageAward(request: Request, response: Response) {
+  let { pageId } = request.params;
+  let { catergory, date, url } = request.body;
+
+  let result = await new Award(catergory, date, url).AddAward(pageId);
+
+  if (result) {
+    return response.json({
+      message: "Add award sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "Add award failed",
+      data: null,
+    });
+  }
+}
+
+async function putPageAward(request: Request, response: Response) {
+  let { awardId } = request.params;
+  let { catergory, date, url } = request.body;
+
+  let result = await new Award(catergory, date, url).UpdateAward(awardId);
+
+  if (result) {
+    return response.json({
+      message: "Update award sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "Update award failed",
+      data: null,
+    });
+  }
+}
+
+async function getPageAwards(request: Request, response: Response) {
+  let { pageId } = request.params;
+
+  console.log(pageId);
+  let result = await Award.GetAwards(pageId);
+
+  if (result) {
+    return response.json({
+      message: "get awards sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "get award failed",
+      data: null,
+    });
+  }
+}
+
 module.exports = {
   postPage,
   getPages,
   getPageDetail,
   getManageDetail,
+  getPageAwards,
+  putPageAward,
+  postPageAward,
   putAboutPaage,
 };

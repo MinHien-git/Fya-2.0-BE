@@ -13,7 +13,8 @@ function authenticationToken(
   if (token == null) return response.sendStatus(401);
 
   jwt.verify(token, ACCESS_TOKEN, (err, user: any) => {
-    if (err) return response.sendStatus(403);
+    console.log(err);
+    if (err) return response.sendStatus(401);
     request.user = user;
     next();
   });

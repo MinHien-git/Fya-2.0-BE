@@ -11,26 +11,29 @@ let authController = require("../controllers/authentication.controller");
 
 const route = express.Router();
 
-route.post("/token", (request: Request, response: Response) => {
+route.post("/token", async (request: Request, response: Response) => {
   try {
     const refreshToken = request.body.token;
     if (refreshToken == null) return response.sendStatus(401);
-    if (!refreshToken.includes(refreshToken)) {
+    let rs = await pool.query("Select * from get_token($1)", [refreshToken]);
+    if (!rs) {
       return response.sendStatus(403);
     }
     jwt.verify(refreshToken, REFRESH_TOKEN, async (error: any, user: any) => {
       if (error) return response.sendStatus(403);
 
-      await pool.query("Select * FROM remove_token($1)", [refreshToken]);
+      // await pool.query("Select * FROM remove_token($1)", [refreshToken]);
 
-      const newRfToken = jwt.sign(user, REFRESH_TOKEN, { expiresIn: "31d" });
+      // const newRfToken = jwt.sign({ ...user }, REFRESH_TOKEN, {
+      //   expiresIn: "30d",
+      // });
       const accesstoken = authUtils.generateAccessToken({ email: user.email });
 
-      await pool.query("Select * FROM add_token($1)", [newRfToken]);
+      // await pool.query("Select * FROM add_token($1)", [newRfToken]);
 
       response.json({
         accesstoken: accesstoken,
-        refreshToken: newRfToken,
+        // refreshToken: newRfToken,
         user: user,
       });
     });
