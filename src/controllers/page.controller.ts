@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Page from "../models/page.models";
 import pool from "../database";
 import { Award } from "../models/award.models";
+import { Service } from "../models/service.model";
 
 async function postPage(request: Request, response: Response) {
   let {
@@ -121,9 +122,11 @@ async function putAboutPaage(request: Request, response: Response) {
 
 async function postPageAward(request: Request, response: Response) {
   let { pageId } = request.params;
-  let { catergory, date, url } = request.body;
+  let { catergory, date, url, award_name } = request.body;
 
-  let result = await new Award(catergory, date, url).AddAward(pageId);
+  let result = await new Award(catergory, date, url, award_name).AddAward(
+    pageId
+  );
 
   if (result) {
     return response.json({
@@ -140,9 +143,29 @@ async function postPageAward(request: Request, response: Response) {
 
 async function putPageAward(request: Request, response: Response) {
   let { awardId } = request.params;
-  let { catergory, date, url } = request.body;
+  let { catergory, date, url, award_name } = request.body;
 
-  let result = await new Award(catergory, date, url).UpdateAward(awardId);
+  let result = await new Award(catergory, date, url, award_name).UpdateAward(
+    awardId
+  );
+
+  if (result) {
+    return response.json({
+      message: "Update award sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "Update award failed",
+      data: null,
+    });
+  }
+}
+
+async function deletePageAward(request: Request, response: Response) {
+  let { awardId } = request.params;
+
+  let result = await Award.deleteAwards(awardId);
 
   if (result) {
     return response.json({
@@ -176,6 +199,91 @@ async function getPageAwards(request: Request, response: Response) {
   }
 }
 
+async function postPageService(request: Request, response: Response) {
+  let { pageId } = request.params;
+  let { service_description, price, service_tags, skills_tags } = request.body;
+  console.log(request.body);
+  let result = await new Service(
+    service_tags,
+    service_description,
+    Number.parseFloat(price),
+    skills_tags
+  ).addService(pageId);
+
+  if (result) {
+    return response.json({
+      message: "Add service sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "Add service failed",
+      data: null,
+    });
+  }
+}
+
+async function putPageService(request: Request, response: Response) {
+  let { serviceId } = request.params;
+  let { service_description, price, service_tags, skills_tags } = request.body;
+
+  let result = await new Service(
+    service_tags,
+    service_description,
+    price,
+    skills_tags
+  ).updateService(serviceId);
+
+  if (result) {
+    return response.json({
+      message: "Update award sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "Update award failed",
+      data: null,
+    });
+  }
+}
+
+async function deletePageService(request: Request, response: Response) {
+  let { awardId } = request.params;
+
+  let result = await Award.deleteAwards(awardId);
+
+  if (result) {
+    return response.json({
+      message: "Update award sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "Update award failed",
+      data: null,
+    });
+  }
+}
+
+async function getPageService(request: Request, response: Response) {
+  let { pageId } = request.params;
+
+  console.log(pageId);
+  let result = await Service.getServices(pageId);
+
+  if (result) {
+    return response.json({
+      message: "get services sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "get services failed",
+      data: null,
+    });
+  }
+}
+
 module.exports = {
   postPage,
   getPages,
@@ -184,5 +292,10 @@ module.exports = {
   getPageAwards,
   putPageAward,
   postPageAward,
+  deletePageAward,
   putAboutPaage,
+  postPageService,
+  putPageService,
+  deletePageService,
+  getPageService,
 };
