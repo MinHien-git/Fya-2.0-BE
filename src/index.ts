@@ -25,7 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(authenticationRoute);
 app.use(projectRoute);
 app.use(pageRoute);
+const pageController = require("./controllers/page.controller");
 
+app.get("/page", pageController.getPages);
 //Admin route
 app.use(adminRoute);
 

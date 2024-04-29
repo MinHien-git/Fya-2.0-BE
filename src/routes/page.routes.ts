@@ -4,7 +4,6 @@ import authenticationMiddleware from "../middlewares/authentication.middleware";
 const router = express.Router();
 const pageController = require("../controllers/page.controller");
 
-router.get("/page", pageController.getPages);
 router.get("/page/:id", pageController.getPageDetail);
 
 router.use(authenticationMiddleware);
