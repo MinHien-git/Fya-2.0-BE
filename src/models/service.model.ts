@@ -1,13 +1,13 @@
 import pool from "../database";
 
 export class Service {
-  services: Array<string>;
+  services: string;
   description: string;
   price: number;
   skills: Array<string>;
 
   constructor(
-    services: Array<string>,
+    services: string,
     description: string,
     price: number,
     skills: Array<string>
@@ -16,6 +16,14 @@ export class Service {
     this.description = description;
     this.price = price;
     this.skills = skills;
+  }
+  static async getService(serviceId: string) {
+    try {
+      return (await pool.query("SELECT * FROM get_service($1)", [serviceId]))
+        .rows[0];
+    } catch {
+      return null;
+    }
   }
 
   static async getServices(pageId: string) {
@@ -44,24 +52,20 @@ export class Service {
   }
 
   async updateService(serviceId: String) {
-    //   try {
-    //     return await pool.query("SELECT * FROM update_award($1, $2, $3, $4,$5)", [
-    //       awardId,
-    //       this.catergory,
-    //       this.date,
-    //       this.url,
-    //       this.award_name,
-    //     ]);
-    //   } catch (error) {
-    //     console.log(error);
-    //     return null;
-    //   }
-    return null;
+    try {
+      return await pool.query(
+        "SELECT * FROM update_service($1, $2, $3, $4,$5)",
+        [serviceId, this.services, this.skills, this.description, this.price]
+      );
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 
   static async deleteService(serviceId: string) {
     try {
-      return (await pool.query("SELECT * FROM delete_award($1)", [serviceId]))
+      return (await pool.query("SELECT * FROM delete_service($1)", [serviceId]))
         .rows;
     } catch (error) {
       console.log(error);

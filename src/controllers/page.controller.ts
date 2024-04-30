@@ -3,6 +3,7 @@ import Page from "../models/page.models";
 import pool from "../database";
 import { Award } from "../models/award.models";
 import { Service } from "../models/service.model";
+import { Address } from "../models/address.models";
 
 async function postPage(request: Request, response: Response) {
   let {
@@ -120,6 +121,84 @@ async function putAboutPaage(request: Request, response: Response) {
   }
 }
 
+//#region Additional Address
+async function postPageAdditionAddress(request: Request, response: Response) {
+  let { pageId } = request.params;
+  let { description } = request.body;
+
+  let result = await new Address(description).AddAddress(pageId);
+
+  if (result) {
+    return response.json({
+      message: "Add award sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "Add award failed",
+      data: null,
+    });
+  }
+}
+
+async function putPageAdditionAddress(request: Request, response: Response) {
+  let { contactId } = request.params;
+  let { description } = request.body;
+
+  let result = await new Address(description).UpdateAddress(contactId);
+
+  if (result) {
+    return response.json({
+      message: "Update address sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "Update address failed",
+      data: null,
+    });
+  }
+}
+
+async function deletePageAdditionAddress(request: Request, response: Response) {
+  let { contactId } = request.params;
+
+  let result = await Address.deleteAddress(contactId);
+
+  if (result) {
+    return response.json({
+      message: "Update address sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "Update address failed",
+      data: null,
+    });
+  }
+}
+
+async function getPageAdditionAddresses(request: Request, response: Response) {
+  let { pageId } = request.params;
+
+  console.log(pageId);
+  let result = await Address.GetAddresses(pageId);
+
+  if (result) {
+    return response.json({
+      message: "get address sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "get address failed",
+      data: null,
+    });
+  }
+}
+//#endregion
+
+//#region Page Awards
 async function postPageAward(request: Request, response: Response) {
   let { pageId } = request.params;
   let { catergory, date, url, award_name } = request.body;
@@ -198,7 +277,9 @@ async function getPageAwards(request: Request, response: Response) {
     });
   }
 }
+//#endregion
 
+//#region Page Service
 async function postPageService(request: Request, response: Response) {
   let { pageId } = request.params;
   let { service_description, price, service_tags, skills_tags } = request.body;
@@ -226,7 +307,7 @@ async function postPageService(request: Request, response: Response) {
 async function putPageService(request: Request, response: Response) {
   let { serviceId } = request.params;
   let { service_description, price, service_tags, skills_tags } = request.body;
-
+  console.log(service_tags);
   let result = await new Service(
     service_tags,
     service_description,
@@ -236,36 +317,55 @@ async function putPageService(request: Request, response: Response) {
 
   if (result) {
     return response.json({
-      message: "Update award sucessfully",
-      data: result,
+      message: "Update service sucessfully",
+      data: result.rows[0],
     });
   } else {
     return response.json({
-      message: "Update award failed",
+      message: "Update service failed",
       data: null,
     });
   }
 }
 
 async function deletePageService(request: Request, response: Response) {
-  let { awardId } = request.params;
+  let { serviceId } = request.params;
 
-  let result = await Award.deleteAwards(awardId);
+  let result = await Service.deleteService(serviceId);
 
   if (result) {
     return response.json({
-      message: "Update award sucessfully",
+      message: "delete service sucessfully",
       data: result,
     });
   } else {
     return response.json({
-      message: "Update award failed",
+      message: "delete service failed",
       data: null,
     });
   }
 }
 
 async function getPageService(request: Request, response: Response) {
+  let { serviceId } = request.params;
+
+  console.log(serviceId);
+  let result = await Service.getService(serviceId);
+
+  if (result) {
+    return response.json({
+      message: "get service sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "get service failed",
+      data: null,
+    });
+  }
+}
+
+async function getPageServices(request: Request, response: Response) {
   let { pageId } = request.params;
 
   console.log(pageId);
@@ -283,7 +383,7 @@ async function getPageService(request: Request, response: Response) {
     });
   }
 }
-
+//#endregion
 module.exports = {
   postPage,
   getPages,
@@ -298,4 +398,9 @@ module.exports = {
   putPageService,
   deletePageService,
   getPageService,
+  getPageServices,
+  getPageAdditionAddresses,
+  deletePageAdditionAddress,
+  putPageAdditionAddress,
+  postPageAdditionAddress,
 };

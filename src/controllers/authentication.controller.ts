@@ -3,6 +3,7 @@ import { User } from "../models/user.model";
 import pool from "../database";
 
 async function signinController(request: Request, response: Response) {
+  console.log(request.body);
   const { email, password } = request.body;
   let user = new User(email, password);
   let result = await user.signin();

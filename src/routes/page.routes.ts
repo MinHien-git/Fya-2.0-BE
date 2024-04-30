@@ -16,13 +16,25 @@ router.put("/page/award/:awardId/update", pageController.putPageAward);
 router.delete("/page/award/:awardId/delete", pageController.deletePageAward);
 router.get("/page/awards/:pageId", pageController.getPageAwards);
 
+router.post("/page/address/:pageId", pageController.postPageAdditionAddress);
+router.put(
+  "/page/address/:contactId/update",
+  pageController.putPageAdditionAddress
+);
+router.delete(
+  "/page/address/:contactId/delete",
+  pageController.deletePageAdditionAddress
+);
+router.get("/page/addresses/:pageId", pageController.getPageAdditionAddresses);
+
 router.post("/page/service/:pageId", pageController.postPageService);
 router.put("/page/service/:serviceId/update", pageController.putPageService);
 router.delete(
-  "/page/service/:awardId/delete",
+  "/page/service/:serviceId/delete",
   pageController.deletePageService
 );
-router.get("/page/services/:pageId", pageController.getPageService);
+router.get("/page/services/:pageId", pageController.getPageServices);
+router.get("/page/service/:serviceId", pageController.getPageService);
 
 router.post("/page", pageController.postPage);
 

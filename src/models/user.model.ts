@@ -30,7 +30,8 @@ export class User {
       const result = await pool.query("SELECT * FROM signin($1)", [this.email]);
 
       const user: User = result.rows[0];
-      if (user.email != null) {
+      console.log(result, this);
+      if (user?.email != null) {
         if (bcrypt.compareSync(this.password, user.password)) {
           const accesstoken = authUtils.generateAccessToken(user);
           const refreshToken = jwt.sign({ ...user }, REFRESH_TOKEN, {
