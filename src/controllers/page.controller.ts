@@ -4,6 +4,21 @@ import pool from "../database";
 import { Award } from "../models/award.models";
 import { Service } from "../models/service.model";
 import { Address } from "../models/address.models";
+import Company from "../models/company.models";
+const cloudinaryConfig = {
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+};
+
+const cloudinary = require("cloudinary").v2;
+cloudinary.config(cloudinaryConfig);
+async function handleUpload(file: any) {
+  const res = await cloudinary.uploader.upload(file, {
+    resource_type: "auto",
+  });
+  return res;
+}
 
 async function postPage(request: Request, response: Response) {
   let {
@@ -384,7 +399,138 @@ async function getPageServices(request: Request, response: Response) {
   }
 }
 //#endregion
+
+//#region Company information
+
+async function getCompany(request: Request, response: Response) {
+  const { pageId } = request.params;
+  let result = await new Company(pageId).GetCompany();
+  if (result) {
+    return response.json({
+      message: "get company sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "get company failed",
+      data: null,
+    });
+  }
+}
+
+async function postCompanyPicture(request: Request, response: Response) {
+  const { pageId } = request.params;
+  console.log(request.file);
+  try {
+    const b64 = Buffer.from(request.file.buffer).toString("base64");
+    let dataURI = "data:" + request.file.mimetype + ";base64," + b64;
+    const team_cover = await handleUpload(dataURI);
+    let result = await new Company(
+      pageId,
+      "",
+      "",
+      team_cover.url
+    ).AddTeamCover();
+    if (result) {
+      return response.json({
+        message: "post company team cover sucessfully",
+        data: result,
+      });
+    } else {
+      return response.json({
+        message: "post company team cover failed",
+        data: null,
+      });
+    }
+  } catch (error: any) {
+    await pool.query("SELECT * FROM add_company_picture($1,$2)", [pageId, ""]);
+    console.log(error);
+    response.send({
+      message: error.message,
+    });
+  }
+}
+async function postCompanyStory(request: Request, response: Response) {
+  const { pageId } = request.params;
+  const { story } = request.body;
+  let result = await new Company(pageId, "", "", "", story).AddStory();
+
+  if (result) {
+    return response.json({
+      message: "post company story sucessfully",
+      data: result,
+    });
+  } else {
+    return response.json({
+      message: "post company story failed",
+      data: null,
+    });
+  }
+}
+async function postCompanyLogo(request: Request, response: Response) {
+  const { pageId } = request.params;
+
+  try {
+    const b64 = Buffer.from(request.file.buffer).toString("base64");
+    let dataURI = "data:" + request.file.mimetype + ";base64," + b64;
+    const logo = await handleUpload(dataURI);
+    console.log(logo);
+
+    let result = await new Company(pageId, logo.url).AddLogo();
+
+    if (result) {
+      return response.json({
+        message: "post company logo sucessfully",
+        data: result,
+      });
+    } else {
+      await pool.query("SELECT * FROM add_company_logo($1,$2)", [pageId, ""]);
+      return response.json({
+        message: "post company logo failed",
+        data: null,
+      });
+    }
+  } catch (error: any) {
+    console.log(error);
+    response.send({
+      message: error.message,
+    });
+  }
+}
+async function postCompanyCover(request: Request, response: Response) {
+  const { pageId } = request.params;
+  try {
+    const b64 = Buffer.from(request.file.buffer).toString("base64");
+    let dataURI = "data:" + request.file.mimetype + ";base64," + b64;
+    const cover = await handleUpload(dataURI);
+    let result = await new Company(pageId, "", cover.url).AddCover();
+
+    if (result) {
+      return response.json({
+        message: "post company cover sucessfully",
+        data: result,
+      });
+    } else {
+      await pool.query("SELECT * FROM add_company_cover($1,$2)", [pageId, ""]);
+      return response.json({
+        message: "post company cover failed",
+        data: null,
+      });
+    }
+  } catch (error: any) {
+    console.log(error);
+    response.send({
+      message: error.message,
+    });
+  }
+}
+//#endregion
 module.exports = {
+  getCompany,
+  postCompanyPicture,
+  postCompanyStory,
+  postCompanyLogo,
+  postCompanyCover,
   postPage,
   getPages,
   getPageDetail,

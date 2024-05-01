@@ -14,7 +14,7 @@ function authenticationToken(
 
   jwt.verify(token, ACCESS_TOKEN, (err, user: any) => {
     console.log(err);
-    if (err) return response.sendStatus(401);
+    if (err) return response.sendStatus(403);
     request.user = user;
     next();
   });

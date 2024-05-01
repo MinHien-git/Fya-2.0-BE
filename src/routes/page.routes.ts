@@ -3,6 +3,15 @@ import authenticationMiddleware from "../middlewares/authentication.middleware";
 
 const router = express.Router();
 const pageController = require("../controllers/page.controller");
+const Multer = require("multer");
+
+const storage = new Multer.memoryStorage();
+const upload = Multer({
+  storage,
+  limits: { fileSize: "1000000" },
+});
+
+exports.module = upload;
 
 router.get("/page/:id", pageController.getPageDetail);
 
@@ -37,5 +46,24 @@ router.get("/page/services/:pageId", pageController.getPageServices);
 router.get("/page/service/:serviceId", pageController.getPageService);
 
 router.post("/page", pageController.postPage);
+
+router.post("/page/:pageId/company/story", pageController.postCompanyStory);
+router.post(
+  "/page/:pageId/company/team_cover",
+  upload.single("my_file"),
+  pageController.postCompanyPicture
+);
+router.post(
+  "/page/:pageId/company/logo",
+  upload.single("my_file"),
+  pageController.postCompanyLogo
+);
+router.post(
+  "/page/:pageId/company/cover",
+  upload.single("my_file"),
+  pageController.postCompanyCover
+);
+
+router.get("/page/:pageId/company", pageController.getCompany);
 
 module.exports = router;

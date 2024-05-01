@@ -30,13 +30,16 @@ export class User {
       const result = await pool.query("SELECT * FROM signin($1)", [this.email]);
 
       const user: User = result.rows[0];
-      console.log(result, this);
       if (user?.email != null) {
         if (bcrypt.compareSync(this.password, user.password)) {
           const accesstoken = authUtils.generateAccessToken(user);
-          const refreshToken = jwt.sign({ ...user }, REFRESH_TOKEN, {
-            expiresIn: "31d",
-          });
+          const refreshToken = jwt.sign(
+            { ...user },
+            process.env.REFRESH_TOKEN_SECRET!,
+            {
+              expiresIn: "31d",
+            }
+          );
 
           await pool.query("Select * FROM add_token($1)", [refreshToken]);
 
@@ -49,6 +52,7 @@ export class User {
       }
     } catch (error) {
       console.log(error);
+
       return null;
     }
     return null;
