@@ -5,6 +5,7 @@ import { Award } from "../models/award.models";
 import { Service } from "../models/service.model";
 import { Address } from "../models/address.models";
 import Company from "../models/company.models";
+import { Portfolio } from "../models/portfolio.model";
 const cloudinaryConfig = {
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
@@ -525,7 +526,202 @@ async function postCompanyCover(request: Request, response: Response) {
   }
 }
 //#endregion
+
+//#region Portfolio
+
+async function getPagePortfolio(request: Request, response: Response) {
+  let { pageId } = request.params;
+  let data = await Portfolio.GetPagePortfolio(pageId);
+  if (data) {
+    return response.json({
+      message: "Successfully all portfolio pages",
+      data: data,
+    });
+  } else {
+    return response.json({
+      message: "Failed all portfolio pages",
+      data: null,
+    });
+  }
+}
+async function getPortfolio(request: Request, response: Response) {
+  let { portfolioId } = request.params;
+  let data = await Portfolio.GetPortfolio(portfolioId);
+  if (data) {
+    return response.json({
+      message: "Successfully Portfolio Single",
+      data: data,
+    });
+  } else {
+    return response.json({
+      message: "Successfully Portfolio Single",
+      data: null,
+    });
+  }
+}
+
+async function PostPortfolio(request: Request, response: Response) {
+  let { pageId } = request.params;
+  let {
+    media,
+    project_name,
+    client_name,
+    client_address,
+    client_sector,
+    budget,
+    services,
+    skills,
+    description,
+    start_date,
+    end_date,
+    is_working,
+    project_scope,
+    project_audience,
+    client_email,
+    project_id,
+    result_link,
+  } = request.body;
+
+  let data = await new Portfolio(
+    media,
+    project_name,
+    client_name,
+    client_address,
+    client_sector,
+    budget,
+    services,
+    skills,
+    description,
+    start_date,
+    end_date,
+    is_working,
+    project_scope,
+    project_audience,
+    client_email,
+    project_id ? project_id : null,
+    result_link
+  ).AddPortfolio(pageId);
+  if (data) {
+    return response.json({
+      message: "Successfully Add portfolio pages",
+      data: { id: data.add_portfolio },
+    });
+  } else {
+    return response.json({
+      message: "Add portfolio pages failed",
+      data: null,
+    });
+  }
+}
+async function PostImage(request: Request, response: Response) {
+  let { portfolioId } = request.params;
+  try {
+    const b64 = Buffer.from(request.file.buffer).toString("base64");
+    let dataURI = "data:" + request.file.mimetype + ";base64," + b64;
+    const portfolio_image = await handleUpload(dataURI);
+    let result = await Portfolio.AddPortfolioImage(
+      portfolioId,
+      portfolio_image.url
+    );
+    if (result) {
+      return response.json({
+        message: "add image to portfolio sucessfully",
+        data: result,
+      });
+    } else {
+      return response.json({
+        message: "add image to portfolio failed",
+        data: null,
+      });
+    }
+  } catch (error: any) {
+    await pool.query("SELECT * FROM add_portfolio_image($1,$2)", [
+      portfolioId,
+      "",
+    ]);
+    console.log(error);
+    response.send({
+      message: error.message,
+    });
+  }
+}
+async function PutPortfolio(request: Request, response: Response) {
+  let { portfolioId } = request.params;
+  let {
+    media,
+    project_name,
+    client_name,
+    client_address,
+    client_sector,
+    budget,
+    services,
+    skills,
+    description,
+    start_date,
+    end_date,
+    is_working,
+    project_scope,
+    project_audience,
+    client_email,
+    project_id,
+    result_link,
+  } = request.body;
+  console.log(request.body);
+  let data = await new Portfolio(
+    media,
+    project_name,
+    client_name,
+    client_address,
+    client_sector,
+    budget,
+    services,
+    skills,
+    description,
+    start_date,
+    end_date,
+    is_working,
+    project_scope,
+    project_audience,
+    client_email,
+    project_id ? project_id : null,
+    result_link
+  ).PutPortfolio(portfolioId);
+  if (data) {
+    return response.json({
+      message: "Successfully Update portfolio pages",
+      data: { id: data.add_portfolio },
+    });
+  } else {
+    return response.json({
+      message: "Update portfolio pages failed",
+      data: null,
+    });
+  }
+}
+
+async function DeletePortfolio(request: Request, response: Response) {
+  let { portfolioId } = request.params;
+  let data = await Portfolio.DeletePortfolio(portfolioId);
+  if (data) {
+    return response.json({
+      message: "Successfully Delete portfolio pages",
+      data: { id: data.delete_portfolio },
+    });
+  } else {
+    return response.json({
+      message: "Delete portfolio pages failed",
+      data: null,
+    });
+  }
+}
+
+//#endregion
 module.exports = {
+  getPagePortfolio,
+  getPortfolio,
+  PostPortfolio,
+  PutPortfolio,
+  DeletePortfolio,
   getCompany,
   postCompanyPicture,
   postCompanyStory,
@@ -549,4 +745,5 @@ module.exports = {
   deletePageAdditionAddress,
   putPageAdditionAddress,
   postPageAdditionAddress,
+  PostImage,
 };

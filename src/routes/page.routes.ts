@@ -42,6 +42,7 @@ router.delete(
   "/page/service/:serviceId/delete",
   pageController.deletePageService
 );
+
 router.get("/page/services/:pageId", pageController.getPageServices);
 router.get("/page/service/:serviceId", pageController.getPageService);
 
@@ -63,7 +64,20 @@ router.post(
   upload.single("my_file"),
   pageController.postCompanyCover
 );
-
 router.get("/page/:pageId/company", pageController.getCompany);
+
+router.get("/page/:pageId/portfolio", pageController.getPagePortfolio);
+router.get("/page/portfolio/:portfolioId", pageController.getPortfolio);
+router.post("/page/portfolio/:pageId", pageController.PostPortfolio);
+router.post(
+  "/page/portfolio/:portfolioId/image",
+  upload.single("my_file"),
+  pageController.PostImage
+);
+router.put("/page/portfolio/:portfolioId/update", pageController.PutPortfolio);
+router.delete(
+  "/page/portfolio/:portfolioId/delete",
+  pageController.DeletePortfolio
+);
 
 module.exports = router;

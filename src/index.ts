@@ -15,7 +15,6 @@ const authenticationRoute = require("./routes/authentication.routes");
 const projectRoute = require("./routes/project.routes");
 const adminRoute = require("./routes/admin.routes");
 const pageRoute = require("./routes/page.routes");
-import { REFRESH_TOKEN } from "./configs/authentication.config";
 
 const corsConfig = {
   origin: true,
