@@ -13,7 +13,7 @@ const upload = Multer({
 
 exports.module = upload;
 
-router.get("/page/:id", pageController.getPageDetail);
+// router.get("/page/:id", pageController.getPageDetail);
 
 router.use(authenticationMiddleware);
 

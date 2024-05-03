@@ -77,10 +77,44 @@ export default class Page {
   }
 
   static async getPage(_id: string) {
+    let pageInfo;
+    let companyInfo;
+    let awards;
+    let services;
+    let portifolio;
     try {
-      let result = await pool.query("Select * from get_brand_page($1)", [_id]);
-      console.log(result);
-      return result.rows[0];
+      let resultInfo = pool.query("Select * from get_brand_page($1)", [_id]);
+      let resultCompany = pool.query(
+        "Select * from add_company_information($1)",
+        [_id]
+      );
+      let resultAwards = pool.query("Select * from get_awards($1)", [_id]);
+      let resultService = pool.query("Select * from get_services($1)", [_id]);
+      let resultPortifolio = pool.query("Select * from get_portfolios($1)", [
+        _id,
+      ]);
+      let data = await Promise.all([
+        resultInfo,
+        resultCompany,
+        resultAwards,
+        resultService,
+        resultPortifolio,
+      ]).then((values) => {
+        pageInfo = values[0].rows[0];
+        companyInfo = values[1].rows[0];
+        awards = values[2].rows;
+        services = values[3].rows;
+        portifolio = values[4].rows;
+        return values;
+      });
+      return {
+        pageInfo,
+        companyInfo,
+        awards,
+        services,
+        portifolio,
+      };
+      // return result.rows[0];
     } catch (e) {
       console.log(e);
       return null;

@@ -15,6 +15,7 @@ const authenticationRoute = require("./routes/authentication.routes");
 const projectRoute = require("./routes/project.routes");
 const adminRoute = require("./routes/admin.routes");
 const pageRoute = require("./routes/page.routes");
+const userRoute = require("./routes/user.routes");
 
 const corsConfig = {
   origin: true,
@@ -66,15 +67,21 @@ app.post("/token", async (request: Request, response: Response) => {
     console.log(error);
   }
 });
+
+app.use(userRoute);
 app.use(authenticationRoute);
 app.use(projectRoute);
 app.use(pageRoute);
-const pageController = require("./controllers/page.controller");
 
-app.get("/page", pageController.getPages);
 //Admin route
 app.use(adminRoute);
-
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
-});
+pool
+  .connect()
+  .then(() =>
+    app.listen(port, () => {
+      console.log(`[server]: Server is running at http://localhost:${port}`);
+    })
+  )
+  .catch((err) => {
+    console.log("Could not connect to database");
+  });
