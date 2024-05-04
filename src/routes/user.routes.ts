@@ -1,13 +1,17 @@
 import express, { Request, Response } from "express";
-import { GetPage, GetPages } from "../controllers/user.controller";
+import authenticationToken from "../middlewares/authentication.middleware";
+import {
+  AddSavePage,
+  GetSavePage,
+  RemoveSavePage,
+} from "../controllers/user.controller";
 
 const router = express.Router();
+router.use(authenticationToken);
 
-router.get("/user/pages", GetPages);
-router.get("/page/:id", GetPage);
+router.post("user/save/:pageId", AddSavePage);
 
-router.get("/user/top/pages", GetPages);
-router.get("/user/page/:pageid", (request: Request, response: Response) => {});
-router.get("/user/pages/search", (request: Request, response: Response) => {});
+router.get("user/save/:id", GetSavePage);
+router.put("user/save/:id/delete", RemoveSavePage);
 
-module.exports = router;
+export default router;
