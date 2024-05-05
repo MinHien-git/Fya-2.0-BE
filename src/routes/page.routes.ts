@@ -15,7 +15,7 @@ exports.module = upload;
 
 // router.get("/page/:id", pageController.getPageDetail);
 
-router.use(authenticationMiddleware);
+router.use("/page/", authenticationMiddleware);
 
 router.get("/management/page/:userId", pageController.getManageDetail);
 router.put("/page/about/update/:pageId", pageController.putAboutPaage);

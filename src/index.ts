@@ -16,6 +16,7 @@ const projectRoute = require("./routes/project.routes");
 const adminRoute = require("./routes/admin.routes");
 const pageRoute = require("./routes/page.routes");
 const guestRoute = require("./routes/guest.routes");
+const userRoute = require("./routes/user.routes");
 
 const corsConfig = {
   origin: true,
@@ -70,6 +71,8 @@ app.post("/token", async (request: Request, response: Response) => {
 
 app.use(guestRoute);
 app.use(authenticationRoute);
+app.use(userRoute);
+
 app.use(projectRoute);
 app.use(pageRoute);
 

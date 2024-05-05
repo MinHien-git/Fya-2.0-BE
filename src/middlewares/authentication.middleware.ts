@@ -9,6 +9,7 @@ function authenticationToken(
   next: NextFunction
 ) {
   const authHeader = request.headers["authorization"];
+  console.log("called");
   const token = authHeader && authHeader?.split(" ")[1];
   if (token == null) return response.sendStatus(401);
 

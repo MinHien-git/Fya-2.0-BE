@@ -11,11 +11,13 @@ async function signinController(request: Request, response: Response) {
     return response.json({
       data: { ...result },
       message: "Login successfully",
+      status: 200,
     });
   } else {
     return response.json({
       message: "Login failed",
       data: null,
+      status: 400,
     });
   }
 }

@@ -4,7 +4,7 @@ import authenticationMiddlewa from "../middlewares/authentication.middleware";
 const router = express.Router();
 const projectController = require("../controllers/project.controller");
 
-router.use(authenticationMiddlewa);
+router.use("/project", authenticationMiddlewa);
 router.get("/project", projectController.getProject);
 router.post("/project", projectController.postProject);
 

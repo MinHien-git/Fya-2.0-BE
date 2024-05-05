@@ -7,11 +7,11 @@ import {
 } from "../controllers/user.controller";
 
 const router = express.Router();
-router.use(authenticationToken);
+router.use("/user/", authenticationToken);
 
-router.post("user/save/:pageId", AddSavePage);
+router.post("/user/save/:pageId", AddSavePage);
 
-router.get("user/save/:id", GetSavePage);
-router.put("user/save/:id/delete", RemoveSavePage);
+router.get("/user/save", GetSavePage);
+router.put("/user/save/:pageId/delete", RemoveSavePage);
 
-export default router;
+module.exports = router;

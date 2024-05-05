@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import authenticationToken from "../middlewares/authentication.middleware";
 
 const router = express.Router();
-router.use(authenticationToken);
+router.use("/admin", authenticationToken);
 router.get("/admin/projects", (request: Request, response: Response) => {
   response.send("Hello world");
 });
