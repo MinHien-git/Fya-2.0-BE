@@ -53,6 +53,7 @@ app.post("/token", async (request: Request, response: Response) => {
         // });
         const accesstoken = authUtils.generateAccessToken({
           email: user.email,
+          id: user.id,
         });
 
         // await pool.query("Select * FROM add_token($1)", [newRfToken]);
