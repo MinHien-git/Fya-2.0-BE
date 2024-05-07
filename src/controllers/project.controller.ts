@@ -12,6 +12,17 @@ async function getProject(request: Request, response: Response) {
   return response.status(500);
 }
 
+async function getUserProjects(request: Request, response: Response) {
+  if (request.user) {
+    let data = await Project.getAllUserProject(request.user.id);
+    return response.json({
+      message: "Successfully get user's project",
+      data: data,
+    });
+  }
+  return response.status(500);
+}
+
 async function getProjectDetail(request: Request, response: Response) {
   let { project_id } = request.params;
   if (request.user) {
@@ -25,6 +36,48 @@ async function getProjectDetail(request: Request, response: Response) {
     } else {
       return response.status(400).json({
         message: "Fail get project detail",
+        data: null,
+      });
+    }
+  } else {
+    return response.status(500);
+  }
+}
+
+async function getProjectDetailAgency(request: Request, response: Response) {
+  let { project_id } = request.params;
+  if (request.user) {
+    let data = await Project.getProjectDetailAgency(project_id);
+
+    if (data) {
+      return response.json({
+        message: "Successfully  get project detail",
+        data: data,
+      });
+    } else {
+      return response.status(400).json({
+        message: "Fail get project detail",
+        data: null,
+      });
+    }
+  } else {
+    return response.status(500);
+  }
+}
+
+async function getUserProjectDetail(request: Request, response: Response) {
+  let { project_id } = request.params;
+  if (request.user) {
+    let data = await Project.getUserProjectDetail(project_id);
+
+    if (data) {
+      return response.json({
+        message: "Successfully  get user project detail",
+        data: data,
+      });
+    } else {
+      return response.status(400).json({
+        message: "Fail get project user detail",
         data: null,
       });
     }
@@ -86,4 +139,7 @@ module.exports = {
   getProject,
   postProject,
   getProjectDetail,
+  getProjectDetailAgency,
+  getUserProjects,
+  getUserProjectDetail,
 };

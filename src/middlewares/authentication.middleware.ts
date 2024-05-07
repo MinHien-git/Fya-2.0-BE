@@ -9,10 +9,11 @@ function authenticationToken(
   next: NextFunction
 ) {
   const authHeader = request.headers["authorization"];
-  console.log("called");
   const token = authHeader && authHeader?.split(" ")[1];
-  if (token == null) return response.sendStatus(401);
-
+  if (token == null) {
+    console.log("empty token");
+    return response.sendStatus(401);
+  }
   jwt.verify(token, ACCESS_TOKEN, (err, user: any) => {
     console.log(err);
     if (err) return response.sendStatus(403);

@@ -17,6 +17,7 @@ const adminRoute = require("./routes/admin.routes");
 const pageRoute = require("./routes/page.routes");
 const guestRoute = require("./routes/guest.routes");
 const userRoute = require("./routes/user.routes");
+const proposalRoute = require("./routes/proposal.routes");
 
 const corsConfig = {
   origin: true,
@@ -35,7 +36,10 @@ app.post("/token", async (request: Request, response: Response) => {
   console.log(process.env.REFRESH_TOKEN_SECRET!);
   try {
     const refreshToken = request.body.token;
-    if (refreshToken == null) return response.sendStatus(401);
+    if (refreshToken == null) {
+      console.log("refresh token empty");
+      return response.sendStatus(401);
+    }
     let rs = await pool.query("Select * from get_token($1)", [refreshToken]);
     if (!rs) {
       return response.sendStatus(403);
@@ -75,6 +79,7 @@ app.use(authenticationRoute);
 app.use(userRoute);
 
 app.use(projectRoute);
+app.use(proposalRoute);
 app.use(pageRoute);
 
 //Admin route

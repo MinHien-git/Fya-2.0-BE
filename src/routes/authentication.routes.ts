@@ -11,25 +11,6 @@ let authController = require("../controllers/authentication.controller");
 
 const route = express.Router();
 
-// route.post("/refreshtoken", (request: Request, response: Response) => {
-//   try {
-//     const refreshToken = request.body?.token;
-//     if (refreshToken) return response.sendStatus(401);
-//     if (!refreshToken.includes(refreshToken)) {
-//       return response.sendStatus(403);
-//     }
-//     jwt.verify(refreshToken, REFRESH_TOKEN, async (error: any, user: any) => {
-//       if (error) return response.sendStatus(403);
-
-//       response.json({
-//         user: user,
-//       });
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// });
-
 route.delete("/logout/:token", authController.logoutController);
 
 route.post("/signup", authController.signupController);
