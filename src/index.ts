@@ -18,6 +18,7 @@ const pageRoute = require("./routes/page.routes");
 const guestRoute = require("./routes/guest.routes");
 const userRoute = require("./routes/user.routes");
 const proposalRoute = require("./routes/proposal.routes");
+const feedbackRoute = require("./routes/feedback.routes");
 
 const corsConfig = {
   origin: true,
@@ -41,14 +42,15 @@ app.post("/token", async (request: Request, response: Response) => {
       return response.sendStatus(401);
     }
     let rs = await pool.query("Select * from get_token($1)", [refreshToken]);
-    if (!rs) {
-      return response.sendStatus(403);
+    if (!rs.rows[0]) {
+      console.log("called");
+      return response.sendStatus(401);
     }
     jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET!,
       async (error: any, user: any) => {
-        if (error) return response.sendStatus(403);
+        if (error) return response.sendStatus(401);
 
         // await pool.query("Select * FROM remove_token($1)", [refreshToken]);
 
@@ -77,6 +79,7 @@ app.post("/token", async (request: Request, response: Response) => {
 app.use(guestRoute);
 app.use(authenticationRoute);
 app.use(userRoute);
+app.use(feedbackRoute);
 
 app.use(projectRoute);
 app.use(proposalRoute);

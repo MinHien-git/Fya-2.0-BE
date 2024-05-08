@@ -64,4 +64,110 @@ export class Proposal {
       return null;
     }
   }
+
+  static async getProposalFeedbackDetail(id: string, project_id: string) {
+    try {
+      let _proposal = {};
+      let _feedback = {};
+      let result = pool.query(
+        "SELECT * FROM get_proposal_feedback_detail($1)",
+        [id]
+      );
+      let result2 = pool.query("SELECT * FROM get_project_feedback($1)", [
+        project_id,
+      ]);
+      let data = await Promise.all([result, result2]).then((values) => {
+        _proposal = values[0].rows[0];
+        _feedback = values[1].rows[0];
+
+        return values;
+      });
+      console.log(result);
+      return { ..._feedback, ..._proposal };
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  static async acceptProposal(_project_id: string, _proposal_id: string) {
+    try {
+      let result = await pool.query("SELECT * FROM accept_proposal($1,$2)", [
+        _project_id,
+        _proposal_id,
+      ]);
+      console.log(result);
+      return result.rows[0];
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  static async rejectProposal(_proposal_id: string) {
+    try {
+      let result = await pool.query("SELECT * FROM decline_proposal($1)", [
+        _proposal_id,
+      ]);
+      console.log(result);
+      return result.rows[0];
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  static async completeProposal(_proposal_id: string) {
+    try {
+      let result = await pool.query(
+        "SELECT * FROM mark_proposal_complete($1)",
+        [_proposal_id]
+      );
+      console.log(result);
+      return result.rows[0];
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  static async cancelProposal(_proposal_id: string) {
+    try {
+      let result = await pool.query(
+        "SELECT * FROM cancel_proposal_complete($1)",
+        [_proposal_id]
+      );
+      console.log(result);
+      return result.rows[0];
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  static async onGoingProposal(user_id: string) {
+    try {
+      let result = await pool.query("SELECT * FROM get_ongoing_proposal($1)", [
+        user_id,
+      ]);
+      console.log(result);
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  static async getCompletedProposal(user_id: string) {
+    try {
+      let result = await pool.query("SELECT * FROM get_complete_proposal($1)", [
+        user_id,
+      ]);
+      console.log(result);
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
 }
