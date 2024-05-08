@@ -35,6 +35,19 @@ export default class Feedback {
       return null;
     }
   }
+  async sendUserFeedback(project_id: string) {
+    try {
+      let result = await pool.query(
+        "SELECT * FROM post_user_feedback($1,$2,$3,$4)",
+        [project_id, this.description, this.rating, this.performance]
+      );
 
+      console.log(result);
+      return result.rows[0];
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
   async getFeedback() {}
 }

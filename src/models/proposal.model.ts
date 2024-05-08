@@ -170,4 +170,53 @@ export class Proposal {
       return null;
     }
   }
+
+  static async getWonProposal(page_id: string) {
+    try {
+      let result = await pool.query("SELECT * FROM get_project_won($1)", [
+        page_id,
+      ]);
+      console.log(result);
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+  static async getArchiveProposal(page_id: string) {
+    try {
+      let result = await pool.query("SELECT * FROM get_project_archived($1)", [
+        page_id,
+      ]);
+      console.log(result);
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  static async getAgencyProposalDetail(id: string, project_id: string) {
+    try {
+      let _proposal = {};
+      let _feedback = {};
+      let result = pool.query("SELECT * FROM get_agency_proposal_detail($1)", [
+        id,
+      ]);
+      let result2 = pool.query("SELECT * FROM get_user_feedback($1)", [
+        project_id,
+      ]);
+      let data = await Promise.all([result, result2]).then((values) => {
+        _proposal = values[0].rows[0];
+        _feedback = values[1].rows[0];
+
+        return values;
+      });
+      console.log(result);
+      return { ..._proposal, ..._feedback };
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
 }

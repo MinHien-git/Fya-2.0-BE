@@ -4,13 +4,16 @@ import {
   accept_proposal,
   cancel_proposal,
   complete_proposal,
+  get_archived_proposal,
   get_completed_proposal,
   get_proposal_detail,
   get_proposal_feedback_detail,
   get_proposals,
+  get_won_proposal,
   ongoing_proposal,
   reject_proposal,
   submit_proposal,
+  get_agency_proposal_detail,
 } from "../controllers/proposal.controller";
 
 const router = express.Router();
@@ -34,4 +37,12 @@ router.put("/proposal/agency/:proposal_id/cancel", cancel_proposal);
 
 router.get("/proposal/user/onGoing", ongoing_proposal);
 router.get("/proposal/user/completed", get_completed_proposal);
+router.get("/proposal/agency/won/:page_id", get_won_proposal);
+router.get("/proposal/agency/archive/:page_id", get_archived_proposal);
+
+router.get(
+  "/proposal/agency/:proposal_id/detail/:project_id",
+  get_agency_proposal_detail
+);
+
 module.exports = router;

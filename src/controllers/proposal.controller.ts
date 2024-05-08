@@ -229,3 +229,75 @@ export async function get_completed_proposal(
     return response.status(403);
   }
 }
+
+export async function get_won_proposal(request: Request, response: Response) {
+  if (request.user) {
+    let { page_id } = request.params;
+    let result = await Proposal.getWonProposal(page_id);
+
+    if (result) {
+      return response.json({
+        message: "Successfully get won proposal",
+        data: result,
+      });
+    } else {
+      return response.status(400).json({
+        message: "Fail get won proposal",
+        data: null,
+      });
+    }
+  } else {
+    return response.status(403);
+  }
+}
+
+export async function get_archived_proposal(
+  request: Request,
+  response: Response
+) {
+  if (request.user) {
+    let { page_id } = request.params;
+    let result = await Proposal.getArchiveProposal(page_id);
+
+    if (result) {
+      return response.json({
+        message: "Successfully get won proposal",
+        data: result,
+      });
+    } else {
+      return response.status(400).json({
+        message: "Fail get won proposal",
+        data: null,
+      });
+    }
+  } else {
+    return response.status(403);
+  }
+}
+
+export async function get_agency_proposal_detail(
+  request: Request,
+  response: Response
+) {
+  if (request.user) {
+    let { proposal_id, project_id } = request.params;
+    let result = await Proposal.getAgencyProposalDetail(
+      proposal_id,
+      project_id
+    );
+
+    if (result) {
+      return response.json({
+        message: "Successfully view proposal details",
+        data: result,
+      });
+    } else {
+      return response.status(400).json({
+        message: "Fail view proposal details",
+        data: null,
+      });
+    }
+  } else {
+    return response.status(403);
+  }
+}
