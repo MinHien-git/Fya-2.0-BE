@@ -82,6 +82,7 @@ export default class Page {
     let awards;
     let services;
     let portifolio;
+    let feedback;
     try {
       let resultInfo = pool.query("Select * from get_brand_page($1)", [_id]);
       let resultCompany = pool.query(
@@ -93,18 +94,26 @@ export default class Page {
       let resultPortifolio = pool.query("Select * from get_portfolios($1)", [
         _id,
       ]);
+
+      let resultFeedbacks = pool.query("Select * from get_page_feedback($1)", [
+        _id,
+      ]);
+
       let data = await Promise.all([
         resultInfo,
         resultCompany,
         resultAwards,
         resultService,
         resultPortifolio,
+        resultFeedbacks,
       ]).then((values) => {
         pageInfo = values[0].rows[0];
         companyInfo = values[1].rows[0];
         awards = values[2].rows;
         services = values[3].rows;
         portifolio = values[4].rows;
+        feedback = values[5].rows;
+        console.log(values);
         return values;
       });
       return {
@@ -113,6 +122,7 @@ export default class Page {
         awards,
         services,
         portifolio,
+        feedback,
       };
       // return result.rows[0];
     } catch (e) {
