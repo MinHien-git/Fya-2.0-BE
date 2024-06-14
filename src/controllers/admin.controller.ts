@@ -90,22 +90,122 @@ export async function getAgencyPage(request: Request, response: Response) {
 
 export async function getData(request: Request, response: Response) {
   try {
-    const result = (await pool.query(`select 
-                                      (select count(*) from users) as user_count,
-                                      (select count(*) from page) as agency_count,
-                                      (select count(*) from page where created_date >= date_trunc('week', current_date)) as new_agency_pages,
-                                      (select count(*) from projects) as all_briefings,
-                                      (select count(*) from projects where created_date >= date_trunc('week', current_date)) as new_briefings,
-                                      (select count(*) from projects where project_status = 0) as briefings_received,
-                                      (select count(*) from projects where project_status = 2) as briefings_rejected,
-                                      (select count(*) from projects where project_status = 1) as open_projects,
-                                      (select count(*) from projects where project_status = 1 and created_date >= date_trunc('week', current_date)) as current_open_projects,
-                                      (select count(*) from proposal) as proposals_received,
-                                      (select count(*) from proposal where accepted = 1) as proposals_rejected,
-                                      (select count(*) from proposal where accepted = 2) as projects_won,
-                                      (select count(*) from proposal where accepted = 2 and proposal_date >= date_trunc('week', current_date)) as new_projects_won,
-                                      (select count(*) from proposal where accepted = 4) as completed_projects,
-                                      (select count(*) from proposal where accepted = 4 and completed_date >= date_trunc('week', current_date)) as new_completed_projects;`)).rows[0];
+    const result = (await pool.query(`with user_ratings as (
+                                          select 
+                                              count(*) as user_rating_count,
+                                              avg(rating) as user_rating_avg
+                                          from (
+                                              select cast(json_extract_path_text(json_array_elements(unnest(performance)), 'value') as float) as rating
+                                              from feedbacks
+                                              union all
+                                              select cast(feedback_rating as float) as rating
+                                              from feedbacks
+                                          ) as subquery
+                                      ),
+                                      agency_ratings as (
+                                          select 
+                                              count(*) as agency_rating_count,
+                                              avg(rating) as agency_rating_avg
+                                          from (
+                                              select cast(json_extract_path_text(json_array_elements(unnest(client_rate)), 'value') as float) as rating
+                                              from user_feedback
+                                              union all
+                                              select cast(feedback_rating as float) as rating
+                                              from user_feedback
+                                          ) as subquery
+                                      ),
+                                      client_ratings as (
+                                          select 
+                                              count(*) as client_rating_count,
+                                              avg(rating) as client_rating_avg
+                                          from (
+                                              select cast(json_extract_path_text(json_array_elements(unnest(client_rate)), 'value') as float) as rating
+                                              from user_feedback 
+                                              join (
+                                                  select distinct on (users.id) users.id 
+                                                  from users 
+                                                  join projects on projects.post_by = users.id
+                                              ) u on user_feedback.user_id = u.id
+                                              union all
+                                              select cast(feedback_rating as float) as rating
+                                              from user_feedback 
+                                              join (
+                                                  select distinct on (users.id) users.id 
+                                                  from users 
+                                                  join projects on projects.post_by = users.id
+                                              ) u on user_feedback.user_id = u.id
+                                          ) as subquery
+                                      ),
+                                      completed_project_ratings_user as (
+                                          select 
+                                              count(*) as completed_project_rating_count,
+                                              avg(rating) as completed_project_rating_avg
+                                          from (
+                                              select cast(json_extract_path_text(json_array_elements(unnest(performance)), 'value') as float) as rating
+                                              from feedbacks
+                                              union all
+                                              select cast(feedback_rating as float) as rating
+                                              from feedbacks
+                                          ) as subquery
+                                      ),
+                                      completed_project_ratings_agency as (
+                                          select 
+                                              count(*) as completed_project_rating_count,
+                                              avg(rating) as completed_project_rating_avg
+                                          from (
+                                              select cast(json_extract_path_text(json_array_elements(unnest(client_rate)), 'value') as float) as rating
+                                              from user_feedback
+                                              union all
+                                              select cast(feedback_rating as float) as rating
+                                              from user_feedback
+                                          ) as subquery
+                                      ),
+                                      completed_project_ratings as (
+                                          select 
+                                              sum(completed_project_rating_count) as completed_project_rating_count,
+                                              avg(completed_project_rating_avg) as completed_project_rating_avg
+                                          from (
+                                              select * from completed_project_ratings_user
+                                              union all
+                                              select * from completed_project_ratings_agency
+                                          ) as subquery
+                                      )
+                                      select 
+                                          (select count(*) from users) as user_count,
+                                          (select count(*) from page) as agency_count,
+                                          (select count(*) from page where created_date >= date_trunc('week', current_date)) as new_agency_pages,
+                                          (select count(*) from projects) as all_briefings,
+                                          (select count(*) from projects where created_date >= date_trunc('week', current_date)) as new_briefings,
+                                          (select count(*) from projects where project_status = 0) as briefings_received,
+                                          (select count(*) from projects where project_status = 2) as briefings_rejected,
+                                          (select count(*) from projects where project_status = 1) as open_projects,
+                                          (select count(*) from projects where project_status = 1 and created_date >= date_trunc('week', current_date)) as current_open_projects,
+                                          (select count(*) from proposal) as proposals_received,
+                                          (select count(*) from proposal where accepted = 1) as proposals_rejected,
+                                          (select count(*) from proposal where accepted = 2) as projects_won,
+                                          (select count(*) from proposal where accepted = 2 and proposal_date >= date_trunc('week', current_date)) as new_projects_won,
+                                          (select count(*) from proposal where accepted > 2) as completed_projects,
+                                          (select count(*) from proposal where accepted > 2 and completed_date >= date_trunc('week', current_date)) as new_completed_projects,
+                                          user_ratings.user_rating_count,
+                                          user_ratings.user_rating_avg,
+                                          agency_ratings.agency_rating_count,
+                                          agency_ratings.agency_rating_avg,
+                                          client_ratings.client_rating_count,
+                                          client_ratings.client_rating_avg,
+                                          completed_project_ratings.completed_project_rating_count,
+                                          completed_project_ratings.completed_project_rating_avg,
+                                          (select count(*) from feedbacks) as user_feedback_count,
+                                          (select count(*) from user_feedback) as agency_feedback_count,
+                                          (select count(distinct users.id) from users 
+                                              join projects on projects.post_by = users.id) as client_count,
+                                          (select count(*) from user_feedback 
+                                              join (
+                                                  select distinct on (users.id) users.id 
+                                                  from users 
+                                                  join projects on projects.post_by = users.id
+                                              ) u on user_feedback.user_id = u.id) as client_feedback_count,
+                                          (select count(*) from feedbacks) + (select count(*) from user_feedback) as completed_project_feedback_count
+                                      from user_ratings, agency_ratings, client_ratings, completed_project_ratings;`)).rows[0];
 
     if (!result) {
       return response.status(400).json({
@@ -116,6 +216,7 @@ export async function getData(request: Request, response: Response) {
     }
 
     const calculatePercentage = (part: number, total: number): number | null => total ? Math.round((part / total) * 100) : null;
+    const calculateAverage = (part: number, total: number): number | null => total ? parseFloat((part / total).toFixed(3)) : null;
     const averageBriefingsPerUser = result.user_count ? parseFloat((result.all_briefings / result.user_count).toFixed(3)) : null;
     const projectsPerThousandBriefings = result.all_briefings ? parseFloat((result.completed_projects / result.all_briefings).toFixed(3)) * 1000 : null;
     
@@ -144,6 +245,22 @@ export async function getData(request: Request, response: Response) {
       completed_projects_growth: calculatePercentage(result.new_completed_projects, result.completed_projects),
       average_briefings_per_user: averageBriefingsPerUser,
       projects_per_thousand_briefings: projectsPerThousandBriefings,
+      user_rating_count: result.user_rating_count,
+      user_rating_avg: result.user_rating_avg.toFixed(3),
+      agency_rating_count: result.agency_rating_count,
+      agency_rating_avg: result.agency_rating_avg.toFixed(3),
+      client_rating_count: result.client_rating_count,
+      client_rating_avg: result.client_rating_avg.toFixed(3),
+      completed_project_rating_count: result.completed_project_rating_count,
+      completed_project_rating_avg: result.completed_project_rating_avg.toFixed(3),
+      user_feedback_count: result.user_feedback_count,
+      user_feedback_avg: calculateAverage(result.user_feedback_count, result.user_count),
+      agency_feedback_count: result.agency_feedback_count,
+      agency_feedback_avg: calculateAverage(result.agency_feedback_count, result.agency_count),
+      client_feedback_count: result.client_feedback_count,
+      client_feedback_avg: calculateAverage(result.client_feedback_count, result.client_count),
+      completed_project_feedback_count: result.completed_project_feedback_count,
+      completed_project_feedback_avg: calculateAverage(result.completed_project_feedback_count, result.completed_projects),
     };
     console.log(data);
     return response.status(200).json({
